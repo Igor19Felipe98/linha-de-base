@@ -9,6 +9,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { scenariosService } from '@/lib/services/scenarios';
 import { SavedScenario } from '@/lib/types';
 import { Calendar, BarChart3, AlertTriangle, TrendingUp } from 'lucide-react';
+import { MonthlyAnalysisTable } from '@/components/scenarios/MonthlyAnalysisTable';
 
 export default function ComparacaoPage() {
   const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
@@ -258,6 +259,11 @@ export default function ComparacaoPage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Análise Mensal Detalhada */}
+        {selectedScenarios.length > 0 && (
+          <MonthlyAnalysisTable scenarios={selectedScenarios} />
         )}
       </div>
     </MainLayout>
