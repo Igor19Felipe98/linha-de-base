@@ -141,9 +141,10 @@ export function MonthlyAnalysisTable({ scenarios }: MonthlyAnalysisTableProps) {
           }
         });
         
-        // Atualizar contagem de pacotes
+        // Atualizar contagem de pacotes (acumular com cenários anteriores)
         Object.entries(packageExecutions).forEach(([pkgName, houses]) => {
-          monthData.packageBreakdown[pkgName] = houses.size;
+          monthData.packageBreakdown[pkgName] = 
+            (monthData.packageBreakdown[pkgName] || 0) + houses.size;
         });
         
         // Somar custos das semanas do mês
