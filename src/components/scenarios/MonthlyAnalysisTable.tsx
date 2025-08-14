@@ -70,30 +70,21 @@ export function MonthlyAnalysisTable({ scenarios }: MonthlyAnalysisTableProps) {
         
         const monthData = monthlyMap.get(monthKey)!;
         
-        // Calcular casas entregues no mês
+        // Calcular casas entregues no mês e em execução
         let housesDeliveredInMonth = 0;
         let housesInExecutionInMonth = new Set<number>();
         let monthCost = 0;
         
-        group.weeks.forEach(weekIndex => {
-          // Contar casas em execução
-          matrix.forEach((row, houseIndex) => {
+        // Para cada casa (linha da matriz)
+        matrix.forEach((row, houseIndex) => {
+          let houseInProgress = false;
+          let houseCompleted = false;
+          
+          // Verificar se a casa está em execução ou foi concluída neste mês
+          group.weeks.forEach(weekIndex => {
             if (row[weekIndex] && row[weekIndex].packageName) {
+              houseInProgress = true;
               housesInExecutionInMonth.add(houseIndex);
-              
-              // Verificar se é última semana do pacote para esta casa
-              const isLastWeek = !row[weekIndex + 1] || 
-                                row[weekIndex + 1].packageName !== row[weekIndex].packageName;
-              
-              if (isLastWeek && weekIndex === group.weeks[group.weeks.length - 1]) {
-                // Casa concluída no último mês
-                const allPackagesComplete = row.every((cell, idx) => 
-                  idx > weekIndex || (cell && cell.packageName)
-                );
-                if (allPackagesComplete) {
-                  housesDeliveredInMonth++;
-                }
-              }
               
               // Contabilizar pacotes em execução
               const pkgName = row[weekIndex].packageName;
@@ -103,6 +94,24 @@ export function MonthlyAnalysisTable({ scenarios }: MonthlyAnalysisTableProps) {
               }
             }
           });
+          
+          // Verificar se a casa foi concluída neste mês
+          // Uma casa está concluída quando o último pacote termina
+          const lastPackageWeek = row.reduceRight((lastWeek, cell, weekIdx) => {
+            if (lastWeek === -1 && cell && cell.packageName) {
+              return weekIdx;
+            }
+            return lastWeek;
+          }, -1);
+          
+          // Se o último pacote da casa termina em uma das semanas deste mês
+          if (lastPackageWeek !== -1 && group.weeks.includes(lastPackageWeek)) {
+            housesDeliveredInMonth++;
+          }
+        });
+        
+        // Somar custos das semanas do mês
+        group.weeks.forEach(weekIndex => {
           
           // Somar custos da semana
           if (financialData[weekIndex]) {

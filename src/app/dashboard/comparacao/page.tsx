@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { MainLayout } from '@/components/layout/main-layout';
 import { scenariosService } from '@/lib/services/scenarios';
 import { SavedScenario } from '@/lib/types';
 import { Calendar, BarChart3, AlertTriangle, TrendingUp } from 'lucide-react';
@@ -105,8 +104,7 @@ export default function ComparacaoPage() {
   const overlappingPeriods = getOverlappingPeriods();
 
   return (
-    <MainLayout>
-      <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center gap-3 mb-6">
           <BarChart3 className="h-8 w-8 text-blue-600" />
           <div>
@@ -241,7 +239,7 @@ export default function ComparacaoPage() {
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">
                     {selectedScenarios.reduce((sum, s) => 
-                      sum + (s.calculationResult?.houses?.length || 0), 0
+                      sum + (s.projectData?.housesCount || 0), 0
                     )}
                   </div>
                   <div className="text-sm text-green-700">Casas Total</div>
@@ -265,7 +263,6 @@ export default function ComparacaoPage() {
         {selectedScenarios.length > 0 && (
           <MonthlyAnalysisTable scenarios={selectedScenarios} />
         )}
-      </div>
-    </MainLayout>
+    </div>
   );
 }
