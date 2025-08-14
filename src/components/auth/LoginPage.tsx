@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useAuth } from './AuthProvider';
 import { Building, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { EnvDebug } from '@/components/debug/EnvDebug';
 
 export function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -226,6 +227,9 @@ export function LoginPage() {
             </form>
           </CardContent>
         </Card>
+
+        {/* Debug Info */}
+        <EnvDebug />
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-500">
