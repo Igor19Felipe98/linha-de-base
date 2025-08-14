@@ -74,40 +74,76 @@ export function MonthlyAnalysisTable({ scenarios }: MonthlyAnalysisTableProps) {
         let housesDeliveredInMonth = 0;
         let housesInExecutionInMonth = new Set<number>();
         let monthCost = 0;
+        let packageExecutions: Record<string, Set<number>> = {};
         
         // Para cada casa (linha da matriz)
         matrix.forEach((row, houseIndex) => {
-          let houseInProgress = false;
-          let houseCompleted = false;
+          let houseHasWorkInMonth = false;
           
-          // Verificar se a casa está em execução ou foi concluída neste mês
+          // Verificar atividades desta casa no mês
           group.weeks.forEach(weekIndex => {
             if (row[weekIndex] && row[weekIndex].packageName) {
-              houseInProgress = true;
+              houseHasWorkInMonth = true;
               housesInExecutionInMonth.add(houseIndex);
               
               // Contabilizar pacotes em execução
               const pkgName = row[weekIndex].packageName;
-              if (pkgName) {
-                monthData.packageBreakdown[pkgName] = 
-                  (monthData.packageBreakdown[pkgName] || 0) + 1;
+              if (!packageExecutions[pkgName]) {
+                packageExecutions[pkgName] = new Set();
               }
+              packageExecutions[pkgName].add(houseIndex);
             }
           });
           
-          // Verificar se a casa foi concluída neste mês
-          // Uma casa está concluída quando o último pacote termina
-          const lastPackageWeek = row.reduceRight((lastWeek, cell, weekIdx) => {
-            if (lastWeek === -1 && cell && cell.packageName) {
-              return weekIdx;
-            }
-            return lastWeek;
-          }, -1);
+          // Verificar se a casa foi CONCLUÍDA neste mês
+          // Para isso, precisamos:
+          // 1. Encontrar a última semana com trabalho para esta casa
+          // 2. Verificar se essa semana está neste mês
+          // 3. Verificar se não há trabalho após essa semana
           
-          // Se o último pacote da casa termina em uma das semanas deste mês
-          if (lastPackageWeek !== -1 && group.weeks.includes(lastPackageWeek)) {
-            housesDeliveredInMonth++;
+          let lastWorkWeek = -1;
+          let firstWorkWeek = -1;
+          
+          // Encontrar primeira e última semana de trabalho
+          for (let weekIdx = 0; weekIdx < row.length; weekIdx++) {
+            if (row[weekIdx] && row[weekIdx].packageName) {
+              if (firstWorkWeek === -1) firstWorkWeek = weekIdx;
+              lastWorkWeek = weekIdx;
+            }
           }
+          
+          // A casa está concluída se:
+          // - Tem trabalho iniciado (firstWorkWeek !== -1)
+          // - A última semana de trabalho está dentro ou antes deste mês
+          // - A última semana de trabalho está nas semanas deste mês
+          // - Não há trabalho programado após a última semana
+          
+          if (firstWorkWeek !== -1 && lastWorkWeek !== -1) {
+            // Verificar se a última semana de trabalho está neste mês
+            const lastWeekInMonth = group.weeks.includes(lastWorkWeek);
+            
+            // Verificar se não há trabalho após a última semana encontrada
+            let hasWorkAfterLastWeek = false;
+            for (let weekIdx = lastWorkWeek + 1; weekIdx < row.length; weekIdx++) {
+              if (row[weekIdx] && row[weekIdx].packageName) {
+                hasWorkAfterLastWeek = true;
+                break;
+              }
+            }
+            
+            // Casa concluída se:
+            // - A última semana está neste mês
+            // - Não há trabalho depois dela
+            // - A casa teve trabalho iniciado antes (não é uma casa vazia)
+            if (lastWeekInMonth && !hasWorkAfterLastWeek) {
+              housesDeliveredInMonth++;
+            }
+          }
+        });
+        
+        // Atualizar contagem de pacotes
+        Object.entries(packageExecutions).forEach(([pkgName, houses]) => {
+          monthData.packageBreakdown[pkgName] = houses.size;
         });
         
         // Somar custos das semanas do mês
