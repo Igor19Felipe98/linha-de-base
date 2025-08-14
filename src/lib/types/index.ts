@@ -113,6 +113,7 @@ export interface SavedScenario {
   createdAt: string;
   updatedAt: string;
   version: number;
+  storageLocation?: 'supabase' | 'local';
 }
 
 export interface ScenarioMetadata {

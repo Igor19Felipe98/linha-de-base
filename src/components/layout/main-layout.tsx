@@ -63,6 +63,12 @@ const navigationItems = [
     href: '/scenarios',
     icon: FolderOpen,
     description: 'Gerenciar cenários'
+  },
+  {
+    title: 'Comparação',
+    href: '/dashboard/comparacao',
+    icon: BarChart3,
+    description: 'Comparar cenários'
   }
 ]
 
