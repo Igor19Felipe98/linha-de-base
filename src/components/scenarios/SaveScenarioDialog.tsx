@@ -39,7 +39,7 @@ export function SaveScenarioDialog({ isOpen, onClose, onSave }: SaveScenarioDial
     setError(null);
 
     try {
-      const savedScenario = saveCurrentScenario(name.trim(), description.trim() || undefined);
+      const savedScenario = await saveCurrentScenario(name.trim(), description.trim() || undefined);
       onSave?.(savedScenario.id);
       onClose();
       setName('');

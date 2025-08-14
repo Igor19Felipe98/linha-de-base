@@ -192,7 +192,7 @@ export function ScenariosManager() {
         }
       } catch (error) {
         console.error('Erro ao migrar cenário:', error);
-        if (error.message.includes('não logado')) {
+        if (error instanceof Error && error.message.includes('não logado')) {
           alert('Você precisa estar logado para migrar cenários para a nuvem.');
         } else {
           alert('Erro ao migrar cenário para a nuvem.');
@@ -282,9 +282,13 @@ export function ScenariosManager() {
                           
                           {/* Indicador de localização */}
                           {scenario.storageLocation === 'supabase' ? (
-                            <Cloud className="h-4 w-4 text-blue-500" title="Salvo na nuvem" />
+                            <div title="Salvo na nuvem">
+                              <Cloud className="h-4 w-4 text-blue-500" />
+                            </div>
                           ) : (
-                            <HardDrive className="h-4 w-4 text-gray-500" title="Salvo localmente" />
+                            <div title="Salvo localmente">
+                              <HardDrive className="h-4 w-4 text-gray-500" />
+                            </div>
                           )}
                           
                           {currentScenarioId === scenario.id && (

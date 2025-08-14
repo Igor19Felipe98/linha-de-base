@@ -19,13 +19,13 @@ export function DebugInfo() {
         hasAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurado' : 'Não configurado'
       },
       localStorage: {
-        scenarios: []
+        scenarios: [] as any[]
       },
       supabase: {
         connected: false,
-        user: null,
-        scenarios: [],
-        error: null
+        user: null as any,
+        scenarios: [] as any[],
+        error: null as any
       }
     };
 
@@ -82,7 +82,7 @@ export function DebugInfo() {
       
     } catch (error) {
       console.error('Erro ao conectar Supabase:', error);
-      result.supabase.error = error.message;
+      result.supabase.error = error instanceof Error ? error.message : 'Erro desconhecido';
     }
 
     setInfo(result);

@@ -34,7 +34,7 @@ export function QuickLogin() {
         setMessage('✅ Usuário criado com sucesso! Agora faça login.');
       }
     } catch (error) {
-      setMessage(`Erro: ${error.message}`);
+      setMessage(`Erro: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
     
     setLoading(false);
@@ -58,7 +58,7 @@ export function QuickLogin() {
         setTimeout(() => window.location.reload(), 1000);
       }
     } catch (error) {
-      setMessage(`Erro: ${error.message}`);
+      setMessage(`Erro: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
     
     setLoading(false);
@@ -78,7 +78,7 @@ export function QuickLogin() {
         setTimeout(() => window.location.reload(), 1000);
       }
     } catch (error) {
-      setMessage(`Erro: ${error.message}`);
+      setMessage(`Erro: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
     
     setLoading(false);
