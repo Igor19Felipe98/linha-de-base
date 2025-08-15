@@ -3,7 +3,6 @@
 import * as React from "react"
 import { formatCurrency } from "@/lib"
 import { TemporalData, TimeUnit } from "@/lib/services/temporal-analytics"
-import * as XLSX from 'xlsx'
 import { Download } from "lucide-react"
 
 interface TemporalTableProps {
@@ -81,7 +80,10 @@ export function TemporalTable({ temporalData, timeUnit }: TemporalTableProps) {
   });
   
   // Função para exportar dados para Excel
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
+    // Importar XLSX dinamicamente apenas quando necessário
+    const XLSX = await import('xlsx')
+    
     // Preparar dados para exportação
     const exportData = tableData.map(period => ({
       [labels.periodLabel]: period.period,
