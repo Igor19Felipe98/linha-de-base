@@ -3,6 +3,8 @@
 import * as React from "react"
 import { formatCurrency } from "@/lib"
 import { TemporalData, TimeUnit } from "@/lib/services/temporal-analytics"
+import * as XLSX from 'xlsx'
+import { Download } from "lucide-react"
 
 interface TemporalTableProps {
   temporalData: TemporalData[]
@@ -77,6 +79,50 @@ export function TemporalTable({ temporalData, timeUnit }: TemporalTableProps) {
         Math.round((cumulativeHouses / totalHouses) * 100) : 0
     };
   });
+  
+  // Função para exportar dados para Excel
+  const exportToExcel = () => {
+    // Preparar dados para exportação
+    const exportData = tableData.map(period => ({
+      [labels.periodLabel]: period.period,
+      'Período Completo': period.fullPeriod,
+      [labels.costLabel]: period.periodCost,
+      'Custo Acumulado': period.cumulativeCost,
+      [labels.housesLabel]: period.housesCompleted,
+      'Total Acumulado': period.cumulativeHouses,
+      'Progresso (%)': period.progressPercentage,
+      [labels.activeLabel]: period.activeDevelopments
+    }))
+    
+    // Adicionar linha de resumo
+    const summary = {
+      [labels.periodLabel]: 'RESUMO',
+      'Período Completo': `${filteredData.length} períodos ativos`,
+      [labels.costLabel]: '',
+      'Custo Acumulado': filteredData.reduce((sum, p) => sum + p.periodCost, 0),
+      [labels.housesLabel]: '',
+      'Total Acumulado': filteredData.reduce((sum, p) => sum + p.housesCompleted, 0),
+      'Progresso (%)': 100,
+      [labels.activeLabel]: filteredData.length > 0 ? Math.max(...filteredData.map(p => p.activeDevelopments)) : 0
+    }
+    
+    exportData.push(summary)
+    
+    // Criar workbook
+    const ws = XLSX.utils.json_to_sheet(exportData)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Detalhamento Temporal')
+    
+    // Gerar nome do arquivo com a data atual
+    const date = new Date().toISOString().split('T')[0]
+    const unitLabel = timeUnit === 'weekly' ? 'semanal' : 
+                     timeUnit === 'monthly' ? 'mensal' : 
+                     timeUnit === 'quarterly' ? 'trimestral' : 'anual'
+    const fileName = `detalhamento_${unitLabel}_${date}.xlsx`
+    
+    // Download do arquivo
+    XLSX.writeFile(wb, fileName)
+  }
 
   // Se não há dados, mostrar mensagem
   if (tableData.length === 0) {
@@ -94,6 +140,18 @@ export function TemporalTable({ temporalData, timeUnit }: TemporalTableProps) {
 
   return (
     <div className="w-full">
+      {/* Botão de exportação */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={exportToExcel}
+          className="flex items-center gap-2 px-4 py-2 bg-industrial-accent text-white rounded-lg hover:bg-industrial-accent/90 transition-colors"
+          disabled={tableData.length === 0}
+        >
+          <Download className="w-4 h-4" />
+          Exportar para Excel
+        </button>
+      </div>
+      
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
