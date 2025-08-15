@@ -148,7 +148,7 @@ export function TemporalTable({ temporalData, timeUnit }: TemporalTableProps) {
           disabled={tableData.length === 0}
         >
           <Download className="w-4 h-4" />
-          Exportar para Excel
+          Exportar Excel
         </button>
       </div>
       
