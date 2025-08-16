@@ -54,7 +54,6 @@ function getTableLabels(timeUnit: TimeUnit) {
 }
 
 export function TemporalTable({ temporalData, timeUnit }: TemporalTableProps) {
-  console.log('TemporalTable renderizado com', temporalData.length, 'períodos')
   const labels = getTableLabels(timeUnit)
   
   // Filtrar períodos que têm atividade (consistente com os gráficos)
